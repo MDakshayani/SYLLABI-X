@@ -4,3 +4,4 @@ flask-jwt-extended==4.7.4
 bcrypt==5.0.0
 python-dotenv==1.2.2
 PyJWT==2.13.0
+gunicorn
