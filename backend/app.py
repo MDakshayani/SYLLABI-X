@@ -86,7 +86,7 @@ app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 
 jwt = JWTManager(app)
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "curriculum_ai.db")
+DB_PATH = os.getenv("SQLITE_DB_PATH", os.path.join(os.path.dirname(__file__), "curriculum_ai.db"))
 
 
 # ─── Database ────────────────────────────────────────────────────────────────
@@ -108,6 +108,9 @@ def close_db(exc):
 import json
 
 def init_db():
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
     with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
@@ -156,6 +159,8 @@ def init_db():
         """)
             
         conn.commit()
+
+init_db()
 
 
 
@@ -647,7 +652,6 @@ def health():
 # ─── Bootstrap ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    init_db()
     print("")
     print("[OK] SyllabiX backend running on http://localhost:5000")
     print("")
