@@ -9,8 +9,6 @@ import useAuthStore from '../store/authStore'
 import { cn } from '../lib/utils'
 import PageTransition from '../components/PageTransition'
 import { api } from '../lib/api'
-import { auth } from '../lib/firebase'
-import { sendPasswordResetEmail } from 'firebase/auth'
 
 
 const colorThemes = [
@@ -905,20 +903,15 @@ export default function Profile() {
                   setForgotError('')
                   setForgotLoading(true)
 
-                  console.log("Current User:", auth.currentUser);
-                  console.log("Current Email:", auth.currentUser?.email);
-
-                  const resetEmail = auth.currentUser?.email || forgotEmail || user?.email;
+                  const resetEmail = forgotEmail || user?.email;
                   console.log("Reset Email being passed:", resetEmail);
 
                   try {
-                    await sendPasswordResetEmail(auth, resetEmail)
+                    await api.forgotPw(resetEmail)
                     setForgotSuccess(true)
                   } catch (error) {
-                    console.error("Firebase Reset Error Code:", error.code);
-                    console.error("Firebase Reset Error Message:", error.message);
-                    console.error(error);
-                    setForgotError(`${error.code} - ${error.message}`)
+                    console.error("Reset Error:", error);
+                    setForgotError(error.message || "Failed to send reset email")
                   } finally {
                     setForgotLoading(false)
                   }

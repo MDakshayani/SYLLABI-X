@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, ArrowRight, Loader2, GraduationCap, CheckCircle, ArrowLeft } from 'lucide-react'
-import { auth } from '../../lib/firebase'
-import { sendPasswordResetEmail } from 'firebase/auth'
+import { api } from '../../lib/api'
 import PageTransition from '../../components/PageTransition'
 
 export default function ForgotPassword() {
@@ -32,16 +31,13 @@ export default function ForgotPassword() {
     setLoading(true)
     
     try {
-      await sendPasswordResetEmail(auth, email);
+      await api.forgotPw(email);
       console.log("PASSWORD RESET EMAIL SENT");
       toast.success("Password reset email sent");
     }
     catch(error) {
-      console.error("Firebase Reset Error Code:", error.code);
-      console.error("Firebase Reset Error Message:", error.message);
-      console.error(error);
-
-      toast.error(`${error.code} - ${error.message}`);
+      console.error("Reset Error:", error);
+      toast.error(error.message || "Failed to send reset email");
     }
     finally {
       setLoading(false)
