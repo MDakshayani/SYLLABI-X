@@ -1,0 +1,217 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  
+  /* Unified Design Token System */
+  --color-primary: var(--accent-color);
+  --color-primary-hover: var(--accent-hover);
+  --color-accent: var(--accent-color);
+  --color-accent-hover: var(--accent-hover);
+  --color-secondary: var(--secondary-color-val);
+  
+  --color-background: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-card: var(--card-bg);
+  --color-border: var(--border-color);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  --color-navbar: var(--navbar-bg);
+  --color-sidebar: var(--sidebar-bg);
+  
+  --color-success: #10B981;
+}
+
+:root {
+  /* Theme variables - Light mode */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --card-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --border-color: #E2E8F0;
+  --accent-color: var(--custom-accent-color, #7C3AED);
+  --accent-hover: var(--custom-accent-color-hover, #6D28D9);
+
+  /* Fallback color override values for legacy/direct references */
+  --primary-color-val: var(--accent-color);
+  --secondary-color-val: #8B5CF6;
+  --accent-color-val: #22D3EE;
+  
+  --navbar-bg: #FFFFFF;
+  --sidebar-bg: #FFFFFF;
+  --navbar-bg-glass: rgba(255, 255, 255, 0.75);
+  --accent-color-hover-shadow: rgba(124, 58, 237, 0.15);
+  --accent-color-btn-shadow: rgba(124, 58, 237, 0.4);
+}
+
+:root.dark {
+  /* Theme variables - Dark mode */
+  --bg-primary: #020617;
+  --bg-secondary: #0F172A;
+  --card-bg: #111827;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --border-color: #334155;
+  --accent-color: var(--custom-accent-color, #8B5CF6);
+  --accent-hover: var(--custom-accent-color-hover, #A78BFA);
+
+  /* Fallback color override values for legacy/direct references */
+  --primary-color-val: var(--accent-color);
+  --secondary-color-val: #A78BFA;
+  --accent-color-val: #22D3EE;
+
+  --navbar-bg: #0B1220;
+  --sidebar-bg: #111827;
+  --navbar-bg-glass: rgba(11, 18, 32, 0.75);
+  --accent-color-hover-shadow: rgba(139, 92, 246, 0.15);
+  --accent-color-btn-shadow: rgba(139, 92, 246, 0.4);
+}
+
+* { 
+  font-family: 'Inter', sans-serif; 
+  box-sizing: border-box; 
+  /* Smooth 300ms theme transition across the entire application */
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── TYPOGRAPHY SYSTEM UTILITIES ── */
+.hero-heading {
+  font-size: 2.5rem; /* 40px */
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.section-heading {
+  font-size: 1.875rem; /* 30px */
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.card-heading {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.body-text {
+  font-size: 1rem; /* 16px */
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.small-text {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .hero-heading {
+    font-size: 4.5rem; /* 72px */
+  }
+  .section-heading {
+    font-size: 3rem; /* 48px */
+  }
+  .card-heading {
+    font-size: 1.5rem; /* 24px */
+  }
+  .body-text {
+    font-size: 1.125rem; /* 18px */
+  }
+}
+
+/* Glassmorphism Containers */
+.glass {
+  background: var(--navbar-bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-color);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gradients */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color-val) 50%, var(--accent-color-val) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--secondary-color-val) 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+}
+
+:root.dark .gradient-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%);
+}
+
+/* Scrollbar Utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom Interactive States */
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 20px 35px -8px var(--accent-color-hover-shadow);
+  border-color: var(--accent-color) !important;
+}
+
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -6px var(--accent-color-btn-shadow);
+}
+.btn-premium:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.icon-hover-animate svg {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+.icon-hover-animate:hover svg {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 0 4px rgba(34, 211, 238, 0.4));
+}
+
+@media print {
+  body { background: white !important; color: black !important; }
+  nav, aside, header, button { display: none !important; }
+  #pdf-content { box-shadow: none !important; border: none !important; }
+}
