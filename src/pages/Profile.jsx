@@ -659,7 +659,7 @@ export default function Profile() {
                   <button
                     type="button"
                     onClick={() => {
-                      setForgotEmail(auth.currentUser?.email || user?.email || '')
+                      setForgotEmail(user?.email || '')
                       setForgotError('')
                       setForgotSuccess(false)
                       setShowForgotModal(true)
