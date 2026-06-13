@@ -352,5 +352,4 @@ npm run dev
 
 1. **Vector Database Integrations**: Support scalable cloud-based search indices (Pinecone or ChromaDB) for DocMentor, enabling massive book QA library tracking.
 2. **Canvas LMS sync**: Introduce automated integrations exporting syllabi directly into learning management platforms.
-3. **Adaptive Quiz Spacing**: Schedule diagnostic assessments dynamically based on student average score histories and mastery targets.#   S y l l a b i X  
- 
+3. **Adaptive Quiz Spacing**: Schedule diagnostic assessments dynamically based on student average score histories and mastery targets.#
