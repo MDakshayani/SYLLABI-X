@@ -9,8 +9,6 @@ import NeuralCursor from './components/NeuralCursor'
 // Auth pages
 import Login          from './pages/auth/Login'
 import Signup         from './pages/auth/Signup'
-import ForgotPassword from './pages/auth/ForgotPassword'
-import ResetPassword  from './pages/auth/ResetPassword'
 
 // App pages
 import HomePage        from './pages/HomePage'
@@ -76,8 +74,6 @@ export default function App() {
       {/* Public auth and informational routes */}
       <Route path="/login"           element={<Login />} />
       <Route path="/signup"          element={<Signup />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password"  element={<ResetPassword />} />
       <Route path="/about"           element={<About />} />
 
       {/* Root path mapping directly to HomePage (public landing page) */}

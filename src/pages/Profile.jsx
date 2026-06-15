@@ -55,12 +55,7 @@ export default function Profile() {
   const [activeTab, setActiveTab] = useState('profile')
   const [successMsg, setSuccessMsg] = useState('')
 
-  // Forgot Password modal states
-  const [showForgotModal, setShowForgotModal] = useState(false)
-  const [forgotEmail, setForgotEmail] = useState('')
-  const [forgotLoading, setForgotLoading] = useState(false)
-  const [forgotSuccess, setForgotSuccess] = useState(false)
-  const [forgotError, setForgotError] = useState('')
+
 
 
   // 1. Profile information states
@@ -655,19 +650,7 @@ export default function Profile() {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setForgotEmail(user?.email || '')
-                      setForgotError('')
-                      setForgotSuccess(false)
-                      setShowForgotModal(true)
-                    }}
-                    className="text-xs text-primary font-bold hover:underline cursor-pointer bg-transparent border-0 outline-none"
-                  >
-                    Forgot Password?
-                  </button>
+                <div className="flex justify-end pt-4 border-t border-border">
                   <button
                     type="submit"
                     className="px-5 py-2.5 bg-primary text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-opacity text-xs cursor-pointer"
@@ -872,114 +855,7 @@ export default function Profile() {
         </main>
       </div>
 
-      {/* ── RESET PASSWORD MODAL ── */}
-      <AnimatePresence>
-        {showForgotModal && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-card border border-border rounded-3xl p-6 shadow-2xl max-w-sm w-full text-left"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-base font-extrabold text-text-primary">Reset Password</h3>
-                <button 
-                  type="button"
-                  onClick={() => { setShowForgotModal(false); setForgotError(''); setForgotSuccess(false); setForgotEmail('') }}
-                  className="p-1 rounded-lg hover:bg-primary/5 text-text-secondary hover:text-text-primary transition-colors cursor-pointer border-0 bg-transparent"
-                >
-                  <X size={16} />
-                </button>
-              </div>
 
-              {!forgotSuccess ? (
-                <form onSubmit={async (e) => {
-                  e.preventDefault()
-                  if (!forgotEmail || !/\S+@\S+\.\S+/.test(forgotEmail)) {
-                    setForgotError('Enter a valid email address')
-                    return
-                  }
-                  setForgotError('')
-                  setForgotLoading(true)
-
-                  const resetEmail = forgotEmail || user?.email;
-                  console.log("Reset Email being passed:", resetEmail);
-
-                  try {
-                    await api.forgotPw(resetEmail)
-                    setForgotSuccess(true)
-                  } catch (error) {
-                    console.error("Reset Error:", error);
-                    setForgotError(error.message || "Failed to send reset email")
-                  } finally {
-                    setForgotLoading(false)
-                  }
-                }} className="space-y-4">
-                  <p className="text-xs text-text-secondary leading-relaxed">
-                    Enter your registered email address. We will send a password reset link.
-                  </p>
-
-                  {forgotError && (
-                    <p className="px-3.5 py-2.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-500 font-semibold">
-                      {forgotError}
-                    </p>
-                  )}
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-text-secondary uppercase tracking-wider mb-2">Email Address</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="you@example.com"
-                      value={forgotEmail}
-                      onChange={(e) => { setForgotEmail(e.target.value); setForgotError('') }}
-                      className="w-full px-4 py-2.5 rounded-xl border border-border bg-card text-text-primary text-xs outline-none focus:border-primary"
-                    />
-                  </div>
-
-                  <div className="flex gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => { setShowForgotModal(false); setForgotError(''); setForgotSuccess(false); setForgotEmail('') }}
-                      className="flex-1 py-2.5 border border-border rounded-xl text-xs font-semibold text-text-secondary hover:bg-primary/5 transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={forgotLoading}
-                      className="flex-1 py-2.5 bg-primary text-white font-bold rounded-xl shadow-md hover:opacity-90 disabled:opacity-60 transition-opacity text-xs cursor-pointer flex items-center justify-center gap-1.5"
-                    >
-                      {forgotLoading ? <Loader2 size={12} className="animate-spin" /> : null}
-                      <span>Send Reset Link</span>
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="text-center py-4 space-y-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto border border-emerald-500/20">
-                    <CheckCircle2 size={24} />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-text-primary">Email Sent Successfully</h4>
-                    <p className="text-xs text-text-secondary mt-1.5 leading-relaxed">
-                      We've sent a password reset link to <span className="font-bold text-text-primary">{forgotEmail}</span>. Check your email (and server log) to complete recovery.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => { setShowForgotModal(false); setForgotSuccess(false); setForgotEmail('') }}
-                    className="w-full py-2.5 bg-primary text-white font-bold rounded-xl shadow-md hover:opacity-90 transition-opacity text-xs cursor-pointer"
-                  >
-                    Done
-                  </button>
-                </div>
-              )}
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       </div>
     </PageTransition>

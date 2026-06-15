@@ -65,21 +65,6 @@ Google OAuth is coordinated via the Firebase SDK on the client and verified on t
 
 ---
 
-## Password Reset Workflow
-
-1. **Request Reset (`/api/forgot-password`)**:
-   - The user enters their email on `/forgot-password`.
-   - The client dispatches a `POST` request to `/api/forgot-password`.
-   - The Flask backend generates a secure random URL token using `secrets.token_urlsafe(32)`.
-   - The token is saved in the user's `reset_token` column in SQLite.
-   - The backend sends a formatted HTML email containing a link:
-     `http://localhost:5174/reset-password?token={reset_token}`.
-2. **Execute Reset (`/api/reset-password`)**:
-   - The user opens the reset link, inputs their new password, and clicks submit.
-   - The client dispatches a `POST` request to `/api/reset-password` containing the token and new password.
-   - The Flask backend verifies the token, hashes the new password, updates the user record, and clears the `reset_token` value.
-
----
 
 ## Session Management & User Persistence
 

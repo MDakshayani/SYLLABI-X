@@ -122,7 +122,6 @@ def init_db():
                 photo_url   TEXT,
                 firebase_uid TEXT,
                 created_at  TEXT    NOT NULL DEFAULT (datetime('now')),
-                reset_token TEXT,
                 phone       TEXT,
                 institution TEXT,
                 role        TEXT,
@@ -136,7 +135,7 @@ def init_db():
         cursor.execute("PRAGMA table_info(users)")
         columns = [row[1] for row in cursor.fetchall()]
         
-        for col in ["photo_url", "firebase_uid", "reset_token", "phone", "institution", "role", "bio", "country", "timezone"]:
+        for col in ["photo_url", "firebase_uid", "phone", "institution", "role", "bio", "country", "timezone"]:
             if col not in columns:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} TEXT")
 
@@ -253,145 +252,7 @@ def logout():
     return jsonify({"message": "Logged out"}), 200
 
 
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
-def send_reset_email(email, reset_link):
-    smtp_host = os.getenv("SMTP_HOST", "localhost")
-    smtp_port = int(os.getenv("SMTP_PORT", 1025))
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    smtp_sender = os.getenv("SMTP_SENDER", "noreply@syllabix.com")
-    smtp_tls = os.getenv("SMTP_TLS", "False").lower() in ("true", "1", "yes")
-    smtp_ssl = os.getenv("SMTP_SSL", "False").lower() in ("true", "1", "yes")
-
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Reset Your Password - SyllabiX"
-    msg["From"] = smtp_sender
-    msg["To"] = email
-
-    text_content = f"Please reset your password by clicking on the following link: {reset_link}"
-    html_content = f"""
-    <html>
-      <body style="font-family: sans-serif; padding: 20px; color: #333;">
-        <h2>Reset Your Password</h2>
-        <p>You requested a password reset for your SyllabiX account.</p>
-        <p>Please click the button below to set a new password:</p>
-        <div style="margin: 24px 0;">
-          <a href="{reset_link}" style="background-color: #5B5FEF; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Reset Password</a>
-        </div>
-        <p>Or copy and paste this link in your browser:</p>
-        <p><a href="{reset_link}">{reset_link}</a></p>
-        <p>If you did not request this, you can ignore this email.</p>
-      </body>
-    </html>
-    """
-    msg.attach(MIMEText(text_content, "plain"))
-    msg.attach(MIMEText(html_content, "html"))
-
-    server = None
-    try:
-        if smtp_ssl:
-            server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10)
-        else:
-            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-            if smtp_tls or smtp_port == 587:
-                server.starttls()
-                
-        if smtp_user and smtp_pass:
-            try:
-                server.login(smtp_user, smtp_pass)
-            except smtplib.SMTPAuthenticationError as ae:
-                print(f"[SMTP DIAGNOSTIC] SMTP Authentication Failed: {ae}")
-                raise Exception(f"SMTP Authentication Failed: {ae}")
-            
-        server.sendmail(smtp_sender, [email], msg.as_string())
-        print(f"[SMTP DIAGNOSTIC] Email Sent Successfully to {email}")
-    except smtplib.SMTPConnectError as ce:
-        print(f"[SMTP DIAGNOSTIC] SMTP Connection Failed: {ce}")
-        raise Exception(f"SMTP Connection Failed: {ce}")
-    except Exception as e:
-        if "Authentication Failed" in str(e):
-            raise e
-        print(f"[SMTP DIAGNOSTIC] Email Delivery Failed: {e}")
-        raise e
-    finally:
-        if server:
-            try:
-                server.quit()
-            except Exception:
-                pass
-
-
-@app.route("/api/forgot-password", methods=["POST"])
-def forgot_password():
-    data  = request.get_json(silent=True) or {}
-    email = (data.get("email") or "").strip().lower()
-
-    if not email:
-        print("[SMTP DIAGNOSTIC] Forgot Password Request Failed: Email is required")
-        return jsonify({"error": "Email is required"}), 400
-
-    db   = get_db()
-    user = db.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
-
-    if not user:
-        print(f"[SMTP DIAGNOSTIC] User Not Found: {email}")
-        return jsonify({"error": "User Not Found"}), 404
-
-    import secrets
-    token = secrets.token_urlsafe(32)
-    db.execute("UPDATE users SET reset_token = ? WHERE id = ?", (token, user["id"]))
-    db.commit()
-
-    origin = request.headers.get("Origin") or "http://localhost:5173"
-    reset_link = f"{origin}/reset-password?token={token}"
-    print(f"[SMTP DIAGNOSTIC] Reset token generated: {token}")
-    print(f"[SMTP DIAGNOSTIC] Reset link created: {reset_link}")
-
-    try:
-        send_reset_email(email, reset_link)
-    except Exception as e:
-        err_msg = str(e)
-        if "Authentication Failed" in err_msg:
-            print("[SMTP DIAGNOSTIC] SMTP Authentication Failed")
-            return jsonify({"error": "SMTP Authentication Failed"}), 500
-        elif "Connection Failed" in err_msg:
-            print("[SMTP DIAGNOSTIC] SMTP Connection Failed")
-            return jsonify({"error": "SMTP Connection Failed"}), 500
-        else:
-            print(f"[SMTP DIAGNOSTIC] Email Delivery Failed")
-            return jsonify({"error": "Email Delivery Failed"}), 500
-
-    print(f"[SMTP DIAGNOSTIC] Email Sent Successfully")
-    return jsonify({"message": "Password reset link has been sent to your email"}), 200
-
-
-
-@app.route("/api/reset-password", methods=["POST"])
-def reset_password():
-    data = request.get_json(silent=True) or {}
-    token = data.get("token") or ""
-    password = data.get("password") or ""
-
-    if not token or not password:
-        return jsonify({"error": "Token and password are required"}), 400
-
-    if len(password) < 8:
-        return jsonify({"error": "Password must be at least 8 characters"}), 400
-
-    db = get_db()
-    user = db.execute("SELECT id FROM users WHERE reset_token = ?", (token,)).fetchone()
-
-    if not user:
-        return jsonify({"error": "Invalid or expired reset token"}), 400
-
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    db.execute("UPDATE users SET password = ?, reset_token = NULL WHERE id = ?", (hashed, user["id"]))
-    db.commit()
-
-    return jsonify({"message": "Password has been reset successfully"}), 200
 
 
 @app.route("/api/google-auth", methods=["POST"])

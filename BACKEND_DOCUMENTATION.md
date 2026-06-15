@@ -29,7 +29,7 @@ The core entry point of the backend. It registers middleware configurations (COR
 #### 1. `init_db()`
 * **Purpose**: Initializes the SQLite database tables and applies necessary columns migrations.
 * **Tables Created**:
-  - `users`: Stores account information, hashed passwords, Firebase UIDs, Reset tokens, and profile fields.
+  - `users`: Stores account information, hashed passwords, Firebase UIDs, and profile fields.
   - `history_records`: Stores generated course outlines, domain inputs, export status flags, and serialized curriculum JSON strings.
 * **Inputs**: None.
 * **Outputs**: None.
@@ -83,21 +83,6 @@ The core entry point of the backend. It registers middleware configurations (COR
 * **Outputs**:
   - Success (`200`): `{ "message": "Logged out" }`
 
-#### 5. `/api/forgot-password` [POST]
-* **Purpose**: Generates a password reset token and dispatches an HTML email via local or configured SMTP.
-* **Inputs**:
-  - JSON Body: `{ "email": "string" }`
-* **Outputs**:
-  - Success (`200`): `{ "message": "Password reset link has been sent to your email" }`
-  - Error (`400` / `404` / `500`): Validation, user-not-found, or SMTP connection error.
-
-#### 6. `/api/reset-password` [POST]
-* **Purpose**: Resets local passwords using a valid verification token.
-* **Inputs**:
-  - JSON Body: `{ "token": "string", "password": "string" }`
-* **Outputs**:
-  - Success (`200`): `{ "message": "Password has been reset successfully" }`
-  - Error (`400`): Validation or invalid/expired token errors.
 
 #### 7. `/api/profile` [GET, PUT] (JWT Required)
 * **Purpose**: Retrieves or updates user profile metadata.
