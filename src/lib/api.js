@@ -1,7 +1,7 @@
 const BASE = import.meta.env.VITE_API_URL || "https://syllabi-x.onrender.com/api"
 
 function getToken() {
-  return localStorage.getItem("access_token")
+  return sessionStorage.getItem("access_token")
 }
 
 async function request(path, options = {}) {

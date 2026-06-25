@@ -3,7 +3,7 @@ import { api } from '../lib/api'
 
 const stored = () => {
   try {
-    const u = localStorage.getItem('auth_user')
+    const u = sessionStorage.getItem('auth_user')
     return u ? JSON.parse(u) : null
   } catch { return null }
 }
@@ -15,16 +15,16 @@ const useAuthStore = create((set, get) => ({
 
   setUser: (user) => {
     set({ user, error: null })
-    if (user) localStorage.setItem('auth_user', JSON.stringify(user))
-    else      localStorage.removeItem('auth_user')
+    if (user) sessionStorage.setItem('auth_user', JSON.stringify(user))
+    else      sessionStorage.removeItem('auth_user')
   },
 
   register: async (name, email, password) => {
     set({ loading: true, error: null })
     try {
       const data = await api.register({ name, email, password })
-      localStorage.setItem('access_token',  data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      sessionStorage.setItem('access_token',  data.access_token)
+      sessionStorage.setItem('refresh_token', data.refresh_token)
       get().setUser(data.user)
       return data
     } catch (e) {
@@ -39,8 +39,8 @@ const useAuthStore = create((set, get) => ({
     set({ loading: true, error: null })
     try {
       const data = await api.login({ email, password })
-      localStorage.setItem('access_token',  data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      sessionStorage.setItem('access_token',  data.access_token)
+      sessionStorage.setItem('refresh_token', data.refresh_token)
       get().setUser(data.user)
       return data
     } catch (e) {
@@ -57,8 +57,8 @@ const useAuthStore = create((set, get) => ({
     set({ loading: true, error: null })
     try {
       const data = await api.googleAuth(profile)
-      localStorage.setItem('access_token',  data.access_token)
-      localStorage.setItem('refresh_token', data.refresh_token)
+      sessionStorage.setItem('access_token',  data.access_token)
+      sessionStorage.setItem('refresh_token', data.refresh_token)
       // Merge photoURL from Firebase (backend doesn't store it)
       get().setUser({ ...data.user, photoURL: profile.photoURL || null })
       return data
@@ -72,9 +72,9 @@ const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try { await api.logout() } catch (err) { console.error("Logout api error:", err) }
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
-    localStorage.removeItem('auth_user')
+    sessionStorage.removeItem('access_token')
+    sessionStorage.removeItem('refresh_token')
+    sessionStorage.removeItem('auth_user')
     set({ user: null, error: null })
   },
 
@@ -92,7 +92,7 @@ const useAuthStore = create((set, get) => ({
   },
 
   clearError: () => set({ error: null }),
-  isAuthenticated: () => !!get().user && !!localStorage.getItem('access_token'),
+  isAuthenticated: () => !!get().user && !!sessionStorage.getItem('access_token'),
 }))
 
 export default useAuthStore

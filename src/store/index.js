@@ -3,7 +3,7 @@ import { api } from '../lib/api'
 
 const getUserId = () => {
   try {
-    const userStr = localStorage.getItem('auth_user')
+    const userStr = sessionStorage.getItem('auth_user')
     if (!userStr) return 'guest'
     const user = JSON.parse(userStr)
     return user.id || user.email || 'guest'
